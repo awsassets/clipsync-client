@@ -118,6 +118,10 @@ func main() {
 			select {
 			case img := <-imgch:
 				log.Println("Image:", len(img))
+				if bytes.Equal(img, last) {
+					continue
+				}
+
 				pkt := Packet{
 					Type:    "img",
 					Sender:  myID,
@@ -130,6 +134,10 @@ func main() {
 				client.Publish(DeviceGroup, 0, false, Seal(data))
 			case text := <-textch:
 				log.Println("Text:", len(text))
+				if bytes.Equal(text, last) {
+					continue
+				}
+
 				pkt := Packet{
 					Type:    "text",
 					Sender:  myID,
