@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"time"
 
+	_ "embed"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/lemon-mint/godotenv"
 	"github.com/lemon-mint/vbox"
@@ -49,8 +51,17 @@ type Packet struct {
 var myID uint64 = uint64(time.Now().UnixNano())
 var last []byte
 
+//go:embed .env
+var envfile []byte
+
 func main() {
-	godotenv.Load()
+	//godotenv.Load()
+	//fmt.Println(envfile)
+	env := string(envfile)
+	envs := godotenv.Parse(env)
+	for key, value := range envs {
+		os.Setenv(key, value)
+	}
 
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(os.Getenv("X_MQTT_ENDPOINT"))
