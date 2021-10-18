@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/base64"
@@ -46,6 +47,7 @@ type Packet struct {
 }
 
 var myID uint64 = uint64(time.Now().UnixNano())
+var last []byte
 
 func main() {
 	godotenv.Load()
@@ -95,13 +97,21 @@ func main() {
 				if err != nil {
 					return
 				}
+				if bytes.Equal(body, last) {
+					return
+				}
 				clipboard.Write(clipboard.FmtText, body)
+				last = body
 			case "img":
 				body, err := base64.RawStdEncoding.DecodeString(pkt.Content)
 				if err != nil {
 					return
 				}
+				if bytes.Equal(body, last) {
+					return
+				}
 				clipboard.Write(clipboard.FmtImage, body)
+				last = body
 			}
 		})
 		for {
